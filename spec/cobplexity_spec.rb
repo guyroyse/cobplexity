@@ -96,7 +96,7 @@ describe Cobplexity::Module do
 100040 MOVE-IT.
 100050     MOVE YES TO OUTPUT.
 100060
-100070 MOVE-IT-AGAIN.
+100070   MOVE-IT-AGAIN.
 100080     MOVE YES TO OUTPUT.
       eos
     end
@@ -107,6 +107,14 @@ describe Cobplexity::Module do
 
     it "creates a paragraph entry for each paragraph" do
       subject.paragraphs.count.should == 3
+    end
+
+    it "adds a name to the paragraph entry" do
+      subject.paragraphs[0].name.should == 'MAINLINE'
+    end
+
+    it "ignores whitespace when parsing paragraph name" do
+      subject.paragraphs[2].name.should == 'MOVE-IT-AGAIN'
     end
 
   end

@@ -10,7 +10,7 @@ module Cobplexity
         cobol_line = Line.new line
         @lines = 0 if cobol_line.procedure_division?
         @lines+= 1 if cobol_line.code?
-        @paragraphs << nil if cobol_line.paragraph?
+        @paragraphs << Paragraph.new(cobol_line.paragraph_name) if cobol_line.paragraph?
       end
     end
   end
@@ -34,6 +34,9 @@ module Cobplexity
     def paragraph?
       !self.area_a.strip.empty?
     end
+    def paragraph_name
+      self.statement.strip.delete '.'
+    end
     def area_a
       self.statement[0..3]
     end
@@ -45,6 +48,13 @@ module Cobplexity
     end
     def procedure_division?
       @line.match /PROCEDURE DIVISION/
+    end
+  end
+
+  class Paragraph
+    attr_reader :name
+    def initialize name
+      @name = name
     end
   end
 
