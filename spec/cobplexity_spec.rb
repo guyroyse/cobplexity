@@ -70,4 +70,15 @@ describe Cobplexity::Module do
     subject.lines.should == 2
   end
 
+  it "doesn't count lines before the PROCEDURE DIVISION" do
+    subject.code = <<-eos
+100000 DATA DIVISION.
+100010 WORKING-STORAGE SECTION.
+100020 PROCEDURE DIVISION.
+100030     MOVE 'Y' to YES.
+100020     CALL MOVE-IT.
+    eos
+    subject.lines.should == 2
+  end
+
 end

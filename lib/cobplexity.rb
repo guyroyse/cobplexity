@@ -4,9 +4,11 @@ module Cobplexity
     attr_reader :code, :lines
     def code= code
       @code = code
-      @lines = @code.lines.count do |line|
+      @lines = 0
+      @code.lines.each do |line|
         cobol_line = Line.new line
-        !cobol_line.blank? && !cobol_line.comment? && !cobol_line.continuation? && !cobol_line.procedure_division_header?
+        @lines = 0 if cobol_line.procedure_division_header?
+        @lines+= 1 if cobol_line.executable?
       end
     end
   end
@@ -15,19 +17,21 @@ module Cobplexity
     def initialize line
       @line = line
     end
+    def executable?
+      !self.blank? && !self.comment? && !self.continuation? && !self.procedure_division_header?
+    end
     def blank?
       @line.strip.empty? || (@line.strip.length < 7) 
     end
     def comment?
-      comment_char = ' '
-      comment_char = @line[6] unless self.blank?
-      comment_char == '*'
+      self.column_7 == '*'
     end
     def continuation?
-      comment_char = ' '
-      comment_char = @line[6] unless self.blank?
-      comment_char == '-'
+      self.column_7 == '-'
     end
+    def column_7
+      self.blank? ? ' ' : @line[6]
+    end 
     def procedure_division_header?
       @line.match /PROCEDURE DIVISION/
     end
