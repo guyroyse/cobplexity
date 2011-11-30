@@ -1,5 +1,5 @@
 class Module
-  attr_writer :code
+  attr_accessor :code
   def lines
     2
   end
