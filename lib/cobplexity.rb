@@ -10,20 +10,24 @@ module Cobplexity
       reset_data
       @code.lines.each do |line|
         @line = Line.new line
-        count_line
-        count_paragraph
+        if @line.procedure_division?
+          reset_data
+        else
+          count_module
+          count_paragraph
+        end
       end
     end
     def reset_data
       @lines = 0
       @paragraphs = []
     end
-    def count_line
-      @lines = 0 if @line.procedure_division?
-      @lines+= 1 if @line.code? 
+    def count_module
+      @lines += 1 if @line.code? 
     end
     def count_paragraph
       @paragraphs << Paragraph.new(@line.paragraph_name) if @line.paragraph?
+      @paragraphs.last.lines += 1 if @line.code? && !@paragraphs.last.nil?
     end
   end
 
@@ -65,8 +69,10 @@ module Cobplexity
 
   class Paragraph
     attr_reader :name
+    attr_accessor :lines
     def initialize name
       @name = name
+      @lines = 0
     end
   end
 

@@ -89,15 +89,20 @@ describe Cobplexity::Module do
 
     before :each do
       subject.code = <<-eos
-100000 MAINLINE.
-100010     MOVE 'Y' to YES.
-100020     CALL MOVE-IT.
-100030
-100040 MOVE-IT.
-100050     MOVE YES TO OUTPUT.
-100060
-100070   MOVE-IT-AGAIN.
-100080     MOVE YES TO OUTPUT.
+100000 INVALID-PARAGRAPH.
+100010    MOVE '1' TO INVALID-MEMORY.
+100020
+100030 PROCEDURE DIVISION.
+100040
+100050 MAINLINE.
+100060     MOVE 'Y' to YES.
+100070     CALL MOVE-IT.
+100080
+100090 MOVE-IT.
+100100     MOVE YES TO OUTPUT.
+100110
+100120   MOVE-IT-AGAIN.
+100130     MOVE YES TO OUTPUT.
       eos
     end
 
@@ -115,6 +120,13 @@ describe Cobplexity::Module do
 
     it "ignores whitespace when parsing paragraph name" do
       subject.paragraphs[2].name.should == 'MOVE-IT-AGAIN'
+    end
+
+    it "counts lines in a paragraph" do
+      subject.paragraphs[0].lines.should == 2
+    end
+
+    it "doesn't count any paragraphs before the PROCEDURE DIVISION" do
     end
 
   end
