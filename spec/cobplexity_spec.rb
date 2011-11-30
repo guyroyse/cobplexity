@@ -16,4 +16,13 @@ describe Module do
     subject.lines.should == 3
   end
 
+  it "doesn't count blank lines" do
+    subject.code = <<-eos
+100000     MOVE 'Y' to YES.
+
+100020     CALL MOVE-IT-AGAIN.
+    eos
+    subject.lines.should == 2
+  end
+
 end
