@@ -4,14 +4,26 @@ module Cobplexity
     attr_reader :code, :lines, :paragraphs
     def code= code
       @code = code
+      analyze_code
+    end
+    def analyze_code
+      reset_data
+      @code.lines.each do |line|
+        @line = Line.new line
+        count_line
+        count_paragraph
+      end
+    end
+    def reset_data
       @lines = 0
       @paragraphs = []
-      @code.lines.each do |line|
-        cobol_line = Line.new line
-        @lines = 0 if cobol_line.procedure_division?
-        @lines+= 1 if cobol_line.code?
-        @paragraphs << Paragraph.new(cobol_line.paragraph_name) if cobol_line.paragraph?
-      end
+    end
+    def count_line
+      @lines = 0 if @line.procedure_division?
+      @lines+= 1 if @line.code? 
+    end
+    def count_paragraph
+      @paragraphs << Paragraph.new(@line.paragraph_name) if @line.paragraph?
     end
   end
 
