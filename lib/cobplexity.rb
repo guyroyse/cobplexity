@@ -27,7 +27,10 @@ module Cobplexity
     end
     def count_paragraph
       @paragraphs << Paragraph.new(@line.paragraph_name) if @line.paragraph?
-      @paragraphs.last.lines += 1 if @line.code? && !@paragraphs.last.nil?
+      if @line.code? && !@paragraphs.last.nil?
+        @paragraphs.last.lines += 1
+        @paragraphs.last.complexity += 1 if @line.branch?
+      end
     end
   end
 
@@ -46,6 +49,11 @@ module Cobplexity
     end
     def continuation?
       self.control == '-'
+    end
+    def branch?
+      self.statement.split.count do |item|
+        item == 'IF'
+      end > 0
     end
     def paragraph?
       !self.area_a.strip.empty?
@@ -69,10 +77,11 @@ module Cobplexity
 
   class Paragraph
     attr_reader :name
-    attr_accessor :lines
+    attr_accessor :lines, :complexity
     def initialize name
       @name = name
       @lines = 0
+      @complexity = 1
     end
   end
 
