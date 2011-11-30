@@ -7,32 +7,35 @@ module Cobplexity
       @lines = 0
       @code.lines.each do |line|
         cobol_line = Line.new line
-        @lines = 0 if cobol_line.procedure_division_header?
-        @lines+= 1 if cobol_line.executable?
+        @lines = 0 if cobol_line.procedure_division?
+        @lines+= 1 if cobol_line.code?
       end
     end
   end
 
   class Line
     def initialize line
-      @line = line
+      @line = line.strip
     end
-    def executable?
-      !self.blank? && !self.comment? && !self.continuation? && !self.procedure_division_header?
+    def code?
+      !self.blank? && !self.comment? && !self.continuation? && !self.procedure_division?
     end
     def blank?
-      @line.strip.empty? || (@line.strip.length < 7) 
+      self.statement.empty?
     end
     def comment?
-      self.column_7 == '*'
+      self.control == '*'
     end
     def continuation?
-      self.column_7 == '-'
+      self.control == '-'
     end
-    def column_7
-      self.blank? ? ' ' : @line[6]
-    end 
-    def procedure_division_header?
+    def control
+      @line.length > 6 ? @line[6] : ' '
+    end
+    def statement
+      @line.length > 7 ? @line[7..@line.length] : ''
+    end
+    def procedure_division?
       @line.match /PROCEDURE DIVISION/
     end
   end
