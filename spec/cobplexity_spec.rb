@@ -25,4 +25,13 @@ describe Module do
     subject.lines.should == 2
   end
 
+  it "doesn't counts lines with only a line number" do
+    subject.code = <<-eos
+100000     MOVE 'Y' to YES.
+100010
+100020     CALL MOVE-IT-AGAIN.
+    eos
+    subject.lines.should == 2
+  end
+
 end
