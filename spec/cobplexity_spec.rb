@@ -76,6 +76,15 @@ describe Cobplexity::Module do
 100010 WORKING-STORAGE SECTION.
 100020 PROCEDURE DIVISION.
 100030     MOVE 'Y' to YES.
+100040     CALL MOVE-IT.
+    eos
+    subject.lines.should == 2
+  end
+
+  it "doesn't count paragraph names" do
+    subject.code = <<-eos
+100020 MAINLINE.
+100030     MOVE 'Y' to YES.
 100020     CALL MOVE-IT.
     eos
     subject.lines.should == 2

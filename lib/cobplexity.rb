@@ -18,7 +18,7 @@ module Cobplexity
       @line = line.strip
     end
     def code?
-      !self.blank? && !self.comment? && !self.continuation? && !self.procedure_division?
+      !self.blank? && !self.comment? && !self.continuation? && !self.paragraph? && !self.procedure_division?
     end
     def blank?
       self.statement.empty?
@@ -28,6 +28,12 @@ module Cobplexity
     end
     def continuation?
       self.control == '-'
+    end
+    def paragraph?
+      !self.area_a.strip.empty?
+    end
+    def area_a
+      self.statement[0..3]
     end
     def control
       @line.length > 6 ? @line[6] : ' '
