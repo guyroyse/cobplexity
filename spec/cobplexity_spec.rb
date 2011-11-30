@@ -154,13 +154,44 @@ describe Cobplexity::Module do
       subject.paragraphs.last.complexity.should == 1
     end
 
-    it "adds 1 to the cyclomatic complextiy of there is an IF statement" do
+    it "adds to the cyclomatic complextiy of there is an IF statement" do
       subject.code = <<-eos
 100050 MAINLINE.
 100060     MOVE 'Y' YES.
 100070     IF YES THEN CALL MOVE-IT.
       eos
       subject.paragraphs.last.complexity.should == 2
+    end
+
+    it "adds to the cyclomatic complextiy of there is more than one IF statement" do
+      subject.code = <<-eos
+100050 MAINLINE.
+100060     MOVE 'Y' YES.
+100070     IF YES THEN CALL MOVE-IT.
+100080     IF NO THEN CALL DONT-MOVE-IT.
+      eos
+      subject.paragraphs.last.complexity.should == 3
+    end
+
+    it "adds to the cyclomatic complextiy of there is an ELSE statement" do
+      subject.code = <<-eos
+100050 MAINLINE.
+100060     MOVE 'Y' YES.
+100070     IF YES THEN
+100080         CALL MOVE-IT
+100090     ELSE
+100100         CALL DONT-MOVE-IT.
+      eos
+      subject.paragraphs.last.complexity.should == 3
+    end
+
+    it "adds to the cyclomatic complextiy of there is an ELSE statement on the same line" do
+      subject.code = <<-eos
+100050 MAINLINE.
+100060     MOVE 'Y' YES.
+100070     IF YES THEN CALL MOVE-IT ELSE CALL DONT-MOVE-IT.
+      eos
+      subject.paragraphs.last.complexity.should == 3
     end
 
   end

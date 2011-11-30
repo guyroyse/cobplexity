@@ -29,7 +29,7 @@ module Cobplexity
       @paragraphs << Paragraph.new(@line.paragraph_name) if @line.paragraph?
       if @line.code? && !@paragraphs.last.nil?
         @paragraphs.last.lines += 1
-        @paragraphs.last.complexity += 1 if @line.branch?
+        @paragraphs.last.complexity += @line.branches
       end
     end
   end
@@ -50,10 +50,10 @@ module Cobplexity
     def continuation?
       self.control == '-'
     end
-    def branch?
+    def branches
       self.statement.split.count do |item|
-        item == 'IF'
-      end > 0
+        item == 'IF' || item == 'ELSE'
+      end
     end
     def paragraph?
       !self.area_a.strip.empty?
