@@ -7,78 +7,128 @@ describe Cobplexity::Module do
     subject.code.should == 'foo'
   end
 
-  it 'counts lines of code' do
-    subject.code = <<-eos
+  context "when counting total lines of code" do 
+
+    it 'counts lines of code' do
+      subject.code = <<-eos
 100000     MOVE 'Y' to YES.
 100010     CALL MOVE-IT.
 100020     CALL MOVE-IT-AGAIN.
-    eos
-    subject.lines.should == 3
-  end
+      eos
+      subject.lines.should == 3
+    end
 
-  it "doesn't count blank lines" do
-    subject.code = <<-eos
+    it "doesn't count blank lines" do
+      subject.code = <<-eos
 100000     MOVE 'Y' to YES.
 
 100020     CALL MOVE-IT-AGAIN.
-    eos
-    subject.lines.should == 2
-  end
+      eos
+      subject.lines.should == 2
+    end
 
-  it "doesn't count lines with only a line number" do
-    subject.code = <<-eos
+    it "doesn't count lines with only a line number" do
+      subject.code = <<-eos
 100000     MOVE 'Y' to YES.
 100010
 100020     CALL MOVE-IT-AGAIN.
-    eos
-    subject.lines.should == 2
-  end
+      eos
+      subject.lines.should == 2
+    end
 
-  it "doesn't count comments" do
-    subject.code = <<-eos
+    it "doesn't count comments" do
+      subject.code = <<-eos
 100000     MOVE 'Y' to YES.
 100010*    CALL MOVE-IT.
 100020     CALL MOVE-IT-AGAIN.
-    eos
-    subject.lines.should == 2
-  end
+      eos
+      subject.lines.should == 2
+    end
 
-  it "doesn't count continuations" do
-    subject.code = <<-eos
+    it "doesn't count continuations" do
+      subject.code = <<-eos
 100000     MOVE 'Y' to YES.
 100010     CALL
 100020-       MOVE-IT.
-    eos
-    subject.lines.should == 2
-  end  
+      eos
+      subject.lines.should == 2
+    end  
 
-  it "counts lines with other characters in column 7" do
-    subject.code = <<-eos
+    it "counts lines with other characters in column 7" do
+      subject.code = <<-eos
 100000     MOVE 'Y' to YES.
 100010/    CALL MOVE-IT.
 100020     CALL MOVE-IT-AGAIN.
-    eos
-    subject.lines.should == 3
-  end  
+      eos
+      subject.lines.should == 3
+    end  
 
-  it "doesn't count the PROCEDURE DIVISION statement" do
-    subject.code = <<-eos
+    it "doesn't count the PROCEDURE DIVISION statement" do
+      subject.code = <<-eos
 100000 PROCEDURE DIVISION.
 100010     MOVE 'Y' to YES.
 100020     CALL MOVE-IT.
-    eos
-    subject.lines.should == 2
-  end
+      eos
+      subject.lines.should == 2
+    end
 
-  it "doesn't count lines before the PROCEDURE DIVISION" do
-    subject.code = <<-eos
+    it "doesn't count lines before the PROCEDURE DIVISION" do
+      subject.code = <<-eos
 100000 DATA DIVISION.
 100010 WORKING-STORAGE SECTION.
 100020 PROCEDURE DIVISION.
 100030     MOVE 'Y' to YES.
-100020     CALL MOVE-IT.
-    eos
-    subject.lines.should == 2
+100040     CALL MOVE-IT.
+      eos
+      subject.lines.should == 2
+    end
+
+  end
+
+  context "when there are paragraphs" do
+
+    before :each do
+      subject.code = <<-eos
+100000 INVALID-PARAGRAPH.
+100010    MOVE '1' TO INVALID-MEMORY.
+100020
+100030 PROCEDURE DIVISION.
+100040
+100050 MAINLINE.
+100060     MOVE 'Y' to YES.
+100070     CALL MOVE-IT.
+100080
+100090 MOVE-IT.
+100100     MOVE YES TO OUTPUT.
+100110
+100120   MOVE-IT-AGAIN.
+100130     MOVE YES TO OUTPUT.
+      eos
+    end
+
+    it "doesn't count paragraph names in total lines of code" do
+      subject.lines.should == 4
+    end
+
+    it "creates a paragraph entry for each paragraph" do
+      subject.paragraphs.count.should == 3
+    end
+
+    it "adds a name to the paragraph entry" do
+      subject.paragraphs[0].name.should == 'MAINLINE'
+    end
+
+    it "ignores whitespace when parsing paragraph name" do
+      subject.paragraphs[2].name.should == 'MOVE-IT-AGAIN'
+    end
+
+    it "counts lines in a paragraph" do
+      subject.paragraphs[0].lines.should == 2
+    end
+
+    it "doesn't count any paragraphs before the PROCEDURE DIVISION" do
+    end
+
   end
 
 end

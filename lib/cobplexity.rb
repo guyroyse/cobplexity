@@ -1,15 +1,33 @@
 module Cobplexity
 
   class Module
-    attr_reader :code, :lines
+    attr_reader :code, :lines, :paragraphs
     def code= code
       @code = code
-      @lines = 0
+      analyze_code
+    end
+    def analyze_code
+      reset_data
       @code.lines.each do |line|
-        cobol_line = Line.new line
-        @lines = 0 if cobol_line.procedure_division?
-        @lines+= 1 if cobol_line.code?
+        @line = Line.new line
+        if @line.procedure_division?
+          reset_data
+        else
+          count_module
+          count_paragraph
+        end
       end
+    end
+    def reset_data
+      @lines = 0
+      @paragraphs = []
+    end
+    def count_module
+      @lines += 1 if @line.code? 
+    end
+    def count_paragraph
+      @paragraphs << Paragraph.new(@line.paragraph_name) if @line.paragraph?
+      @paragraphs.last.lines += 1 if @line.code? && !@paragraphs.last.nil?
     end
   end
 
@@ -18,7 +36,7 @@ module Cobplexity
       @line = line.strip
     end
     def code?
-      !self.blank? && !self.comment? && !self.continuation? && !self.procedure_division?
+      !self.blank? && !self.comment? && !self.continuation? && !self.paragraph? && !self.procedure_division?
     end
     def blank?
       self.statement.empty?
@@ -29,6 +47,15 @@ module Cobplexity
     def continuation?
       self.control == '-'
     end
+    def paragraph?
+      !self.area_a.strip.empty?
+    end
+    def paragraph_name
+      self.statement.strip.delete '.'
+    end
+    def area_a
+      self.statement[0..3]
+    end
     def control
       @line.length > 6 ? @line[6] : ' '
     end
@@ -37,6 +64,15 @@ module Cobplexity
     end
     def procedure_division?
       @line.match /PROCEDURE DIVISION/
+    end
+  end
+
+  class Paragraph
+    attr_reader :name
+    attr_accessor :lines
+    def initialize name
+      @name = name
+      @lines = 0
     end
   end
 
