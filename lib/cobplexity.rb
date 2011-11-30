@@ -1,6 +1,6 @@
 class Module
   attr_accessor :code
   def lines
-    2
+    @code.lines.count
   end
 end
