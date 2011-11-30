@@ -1,14 +1,16 @@
 module Cobplexity
 
   class Module
-    attr_reader :code, :lines
+    attr_reader :code, :lines, :paragraphs
     def code= code
       @code = code
       @lines = 0
+      @paragraphs = []
       @code.lines.each do |line|
         cobol_line = Line.new line
         @lines = 0 if cobol_line.procedure_division?
         @lines+= 1 if cobol_line.code?
+        @paragraphs << nil if cobol_line.paragraph?
       end
     end
   end
