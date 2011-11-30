@@ -141,6 +141,26 @@ describe Cobplexity::Module do
       subject.paragraphs.count.should == 3
     end
 
+    it "counts a COPY in AREA A as code" do
+      subject.code = <<-eos
+100050 MAINLINE.
+100060     MOVE 'Y' TO YES.
+100070     CALL MOVE-IT.
+100080 COPY AWESOME-SAUCE.
+      eos
+      subject.paragraphs[0].lines.should == 3
+    end
+
+    it "doesn't treat a COPY in AREA A as a paragraph" do
+      subject.code = <<-eos
+100050 MAINLINE.
+100060     MOVE 'Y' TO YES.
+100070     CALL MOVE-IT.
+100080 COPY AWESOME-SAUCE.
+      eos
+      subject.paragraphs.count.should == 1
+    end
+
   end
 
   context "when calculating complexity of a paragraph" do

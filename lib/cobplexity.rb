@@ -56,7 +56,7 @@ module Cobplexity
       end
     end
     def paragraph?
-      !self.area_a.strip.empty?
+      !self.statement.match(/COPY /i) && !self.area_a.strip.empty?
     end
     def paragraph_name
       self.statement.strip.delete '.'
@@ -71,7 +71,7 @@ module Cobplexity
       @line.length > 7 ? @line[7..@line.length] : ''
     end
     def procedure_division?
-      @line.match /PROCEDURE DIVISION/
+      @line.match /PROCEDURE DIVISION/i
     end
   end
 
