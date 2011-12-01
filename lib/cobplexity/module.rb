@@ -2,6 +2,9 @@ module Cobplexity
 
   class Module
     attr_reader :code, :lines, :paragraphs
+    def initialize code=''
+      self.code = code
+    end
     def code= code
       @code = code
       analyze_code
