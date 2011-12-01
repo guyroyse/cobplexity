@@ -66,3 +66,27 @@ describe Cobplexity::Analyzer do
   end
 
 end
+
+describe Cobplexity::Metric do
+
+  before :each do
+    subject.size = 10
+    subject.color = 5
+  end
+
+  it "serializes to a CSV string" do
+    subject.categories.concat ["foo", "bar", "baz"]
+    subject.to_s.should == '10,5,foo,bar,baz'
+  end
+
+  it "strips out quotes when converting to a CSV string" do
+    subject.categories.concat ["fo\"o", "bar", "baz"]
+    subject.to_s.should == '10,5,foo,bar,baz'
+  end
+
+  it "strips out commas when converting to a CSV string" do
+    subject.categories.concat ["fo,o", "bar", "baz"]
+    subject.to_s.should == '10,5,foo,bar,baz'
+  end
+
+end

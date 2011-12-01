@@ -41,6 +41,12 @@ module Cobplexity
     def initialize
       @categories = []
     end
+    def to_s
+      categories = @categories.collect do |category|
+        category.delete '",'
+      end
+      "#{@size},#{@color},#{categories.join ','}"
+    end
   end
 
 end
