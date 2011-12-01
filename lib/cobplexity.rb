@@ -52,7 +52,7 @@ module Cobplexity
     end
     def branches
       self.statement.split.count do |item|
-        item == 'IF' || item == 'ELSE'
+        ['IF', 'ELSE', 'WHEN', 'WHILE', 'UNTIL'].include? item.upcase
       end
     end
     def paragraph?

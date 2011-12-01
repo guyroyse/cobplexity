@@ -205,13 +205,42 @@ describe Cobplexity::Module do
       subject.paragraphs.last.complexity.should == 3
     end
 
-    it "adds to the cyclomatic complextiy of there is an ELSE statement on the same line" do
+    it "adds to the cyclomatic complextiy if there is an ELSE statement on the same line" do
       subject.code = <<-eos
 100050 MAINLINE.
 100060     MOVE 'Y' YES.
 100070     IF YES THEN CALL MOVE-IT ELSE CALL DONT-MOVE-IT.
       eos
       subject.paragraphs.last.complexity.should == 3
+    end
+
+    it "adds to the cyclomatic complextiy if there is a WHEN statement" do
+      subject.code = <<-eos
+100050 MAINLINE.
+100060     EVALUATE WS-FLAG
+100070         WHEN 'Y'
+100080             CALL MOVE-IT
+100090         WHEN 'N'
+100100             CALL DONT-MOVE-IT
+100110     END-EVALUATE.
+      eos
+      subject.paragraphs.last.complexity.should == 3
+    end
+
+    it "adds to the cyclomatic complextiy if there is a WHILE statement" do
+      subject.code = <<-eos
+100050 MAINLINE.
+100060     PERFORM MOVE-IT WHILE NOT END-OF-FILE.
+      eos
+      subject.paragraphs.last.complexity.should == 2
+    end
+
+    it "adds to the cyclomatic complextiy if there is an UNTIL statement" do
+      subject.code = <<-eos
+100050 MAINLINE.
+100060     PERFORM MOVE-IT UNTIL END-OF-FILE.
+      eos
+      subject.paragraphs.last.complexity.should == 2
     end
 
   end
