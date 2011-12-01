@@ -13,6 +13,9 @@ Gem::Specification.new do |s|
 	s.required_rubygems_version = ">=1.3.6"
 
 	s.files = Dir["lib/**/*"] 
+  s.files += Dir["bin/*"]
+	
+  s.executables << 'cobplexity'
 
 	s.require_path = 'lib'
 
