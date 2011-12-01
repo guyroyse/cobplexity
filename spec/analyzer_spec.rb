@@ -23,8 +23,8 @@ describe Cobplexity::Analyzer do
   end
 
   it 'returns metrics objects for each paragraph for wildcarded files' do
-    subject.files << 'spec/samples/*.cbl'
-    subject.analyze.count.should == 2
+    subject.files << 'spec/samples/*'
+    subject.analyze.count.should == 4
   end
 
   context "when analyzing a simple program" do
