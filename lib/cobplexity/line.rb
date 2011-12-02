@@ -22,7 +22,7 @@ module Cobplexity
       end
     end
     def paragraph?
-      !self.statement.match(/COPY /i) && !self.area_a.strip.empty?
+      !self.statement.match(/COPY /i) && !self.area_a.strip.empty? && !self.comment? && !self.continuation? && !self.procedure_division?
     end
     def paragraph_name
       self.statement.strip.delete '.'

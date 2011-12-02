@@ -109,6 +109,16 @@ describe Cobplexity::Module do
       subject.paragraphs.count.should == 3
     end
 
+    it "ignores commented out paragraph names" do
+      subject.code = <<-eos
+      *OLD-MAINLINE.
+       MAINLINE.
+           MOVE 'Y' TO YES.
+           CALL MOVE-IT.
+      eos
+      subject.paragraphs.count.should == 1
+    end
+
     it "adds a name to the paragraph entry" do
       subject.paragraphs[0].name.should == 'MAINLINE'
     end
@@ -141,24 +151,25 @@ describe Cobplexity::Module do
       subject.paragraphs.count.should == 3
     end
 
-    it "counts a COPY in AREA A as code" do
-      subject.code = <<-eos
-       MAINLINE.
-           MOVE 'Y' TO YES.
-           CALL MOVE-IT.
-       COPY AWESOME-SAUCE.
-      eos
-      subject.paragraphs[0].lines.should == 3
-    end
+    context "when there is a COPY in AREA A" do
 
-    it "doesn't treat a COPY in AREA A as a paragraph" do
-      subject.code = <<-eos
-       MAINLINE.
-           MOVE 'Y' TO YES.
-           CALL MOVE-IT.
-       COPY AWESOME-SAUCE.
-      eos
-      subject.paragraphs.count.should == 1
+      before :each do
+        subject.code = <<-eos
+         MAINLINE.
+             MOVE 'Y' TO YES.
+             CALL MOVE-IT.
+         COPY AWESOME-SAUCE.
+        eos
+      end
+
+      it "counts a COPY in AREA A as code" do
+        subject.paragraphs[0].lines.should == 3
+      end
+
+      it "doesn't treat a COPY in AREA A as a paragraph" do
+        subject.paragraphs.count.should == 1
+      end
+
     end
 
   end
