@@ -2,7 +2,7 @@ module Cobplexity
 
   class Line
     def initialize line
-      @line = line.strip
+      @line = line.rstrip
     end
     def code?
       !self.blank? && !self.comment? && !self.continuation? && !self.paragraph? && !self.procedure_division?
