@@ -119,6 +119,16 @@ describe Cobplexity::Module do
       subject.paragraphs.count.should == 1
     end
 
+    it "ignores continuations that look like paragraph names" do
+      subject.code = <<-eos
+       MAINLINE.
+           IF YES THEN MOVE
+      -'Y' TO YES.
+           CALL MOVE-IT.
+      eos
+      subject.paragraphs.count.should == 1
+    end
+
     it "adds a name to the paragraph entry" do
       subject.paragraphs[0].name.should == 'MAINLINE'
     end
