@@ -93,7 +93,7 @@ describe Cobplexity::Module do
            MOVE 'Y' TO YES.
            CALL MOVE-IT.
       
-       MOVE-IT.
+       MOVE-IT.                                                         12345678
            MOVE YES TO OUTPUT.
       
          MOVE-IT-AGAIN.
@@ -131,6 +131,10 @@ describe Cobplexity::Module do
 
     it "adds a name to the paragraph entry" do
       subject.paragraphs[0].name.should == 'MAINLINE'
+    end
+
+    it "ignores columns after 72 when parsing paragraph name" do
+      subject.paragraphs[1].name.should == 'MOVE-IT'
     end
 
     it "ignores whitespace when parsing paragraph name" do
@@ -262,6 +266,23 @@ describe Cobplexity::Module do
            PERFORM MOVE-IT UNTIL END-OF-FILE.
       eos
       subject.paragraphs.last.complexity.should == 2
+    end
+
+    it "adds to the cyclomatic complextiy if there is an AND or OR statement" do
+      subject.code = <<-eos
+       MAINLINE.
+           IF X = 3 AND Y = 3 OR BOB = 'T' THEN
+               PERFORM MOVE-IT.
+      eos
+      subject.paragraphs.last.complexity.should == 4
+    end
+
+    it "ignores branch keywords beyond columns 72" do
+      subject.code = <<-eos
+       MAINLINE.
+           PERFORM MOVE-IT.                                             IF ELSE
+      eos
+      subject.paragraphs.last.complexity.should == 1
     end
 
   end
